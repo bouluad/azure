@@ -1,0 +1,33 @@
+{
+  "variables": {
+    "subscription_id": ""
+  },
+  "builders": [
+    {
+      "type": "azure-arm",
+      "subscription_id": "{{user `subscription_id`}}",
+      "client_id": "{{env `AZURE_CLIENT_ID`}}",
+      "client_secret": "{{env `AZURE_CLIENT_SECRET`}}",
+      "tenant_id": "{{env `AZURE_TENANT_ID`}}",
+      "managed_image_resource_group_name": "ci-rg",
+      "managed_image_name": "custom-redhat8-image",
+      "os_type": "Linux",
+      "image_publisher": "RedHat",
+      "image_offer": "RHEL",
+      "image_sku": "8-LVM",
+      "location": "East US",
+      "vm_size": "Standard_D2s_v3"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "echo 'Copying private CA bundle...' && cp /tmp/certs/ca-bundle.crt /etc/pki/ca-trust/source/anchors/",
+        "update-ca-trust",
+        "useradd -m -s /bin/bash afyaut && echo 'afyaut:password123' | chpasswd",
+        "echo 'User afyaut created with automation access.'"
+      ]
+    }
+  ]
+}
