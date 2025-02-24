@@ -1,0 +1,45 @@
+{
+  "variables": {
+    "client_id": "{{env `AZURE_CLIENT_ID`}}",
+    "client_secret": "{{env `AZURE_CLIENT_SECRET`}}",
+    "tenant_id": "{{env `AZURE_TENANT_ID`}}",
+    "subscription_id": "{{env `AZURE_SUBSCRIPTION_ID`}}",
+    "resource_group": "packer-rg",
+    "location": "East US",
+    "image_gallery": "mySharedGallery",
+    "image_definition": "myImageDef"
+  },
+  "builders": [{
+    "type": "azure-arm",
+    "client_id": "{{user `client_id`}}",
+    "client_secret": "{{user `client_secret`}}",
+    "tenant_id": "{{user `tenant_id`}}",
+    "subscription_id": "{{user `subscription_id`}}",
+    "managed_image_resource_group_name": "{{user `resource_group`}}",
+    "managed_image_name": "myCustomImage",
+    "os_type": "Linux",
+    "image_publisher": "Canonical",
+    "image_offer": "UbuntuServer",
+    "image_sku": "20_04-lts",
+    "location": "{{user `location`}}",
+    "vm_size": "Standard_D2s_v3"
+  }],
+  "provisioners": [{
+    "type": "shell",
+    "inline": [
+      "sudo useradd -m -s /bin/bash appuser",
+      "echo 'appuser:Password123!' | sudo chpasswd",
+      "sudo usermod -aG sudo appuser"
+    ]
+  }],
+  "post-processors": [{
+    "type": "azure-arm",
+    "subscription_id": "{{user `subscription_id`}}",
+    "resource_group": "{{user `resource_group`}}",
+    "location": "{{user `location`}}",
+    "gallery_name": "{{user `image_gallery`}}",
+    "image_definition": "{{user `image_definition`}}",
+    "managed_image_name": "myCustomImage",
+    "managed_image_resource_group_name": "{{user `resource_group`}}"
+  }]
+}
