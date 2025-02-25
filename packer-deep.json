@@ -1,0 +1,30 @@
+{
+  "builders": [
+    {
+      "type": "azure-arm",
+      "client_id": "{{user `azure_client_id`}}",
+      "client_secret": "{{user `azure_client_secret`}}",
+      "tenant_id": "{{user `azure_tenant_id`}}",
+      "subscription_id": "{{user `azure_subscription_id`}}",
+      "managed_image_resource_group_name": "{{user `resource_group`}}",
+      "managed_image_name": "gtsimage-app",
+      "os_type": "Linux",
+      "image_publisher": "RedHat",
+      "image_offer": "RHEL",
+      "image_sku": "your-sku", // Replace with your private image SKU
+      "image_version": "latest",
+      "location": "East US", // Replace with your desired region
+      "vm_size": "Standard_DS2_v2"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "sudo useradd -m appuser", // Add application user
+        "sudo mkdir /opt/appdir", // Create empty directory
+        "sudo chown appuser:appuser /opt/appdir" // Set ownership
+      ]
+    }
+  ]
+}
