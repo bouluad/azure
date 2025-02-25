@@ -1,0 +1,36 @@
+name: Build Azure Image with Packer
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: self-hosted # Use your private runner
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Packer
+        run: |
+          wget https://releases.hashicorp.com/packer/1.8.6/packer_1.8.6_linux_amd64.zip
+          unzip packer_1.8.6_linux_amd64.zip
+          sudo mv packer /usr/local/bin/
+
+      - name: Build Azure Image
+        env:
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          RESOURCE_GROUP: ${{ secrets.RESOURCE_GROUP }}
+        run: |
+          packer build \
+            -var 'azure_client_id=$AZURE_CLIENT_ID' \
+            -var 'azure_client_secret=$AZURE_CLIENT_SECRET' \
+            -var 'azure_tenant_id=$AZURE_TENANT_ID' \
+            -var 'azure_subscription_id=$AZURE_SUBSCRIPTION_ID' \
+            -var 'resource_group=$RESOURCE_GROUP' \
+            azure-image.json
