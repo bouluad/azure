@@ -2,18 +2,18 @@
   "builders": [
     {
       "type": "azure-arm",
-      "client_id": "{{user `azure_client_id`}}",
-      "client_secret": "{{user `azure_client_secret`}}",
-      "tenant_id": "{{user `azure_tenant_id`}}",
-      "subscription_id": "{{user `azure_subscription_id`}}",
+      "client_id": "{{user `client_id`}}",
+      "client_secret": "{{user `client_secret`}}",
+      "tenant_id": "{{user `tenant_id`}}",
+      "subscription_id": "{{user `subscription_id`}}",
       "managed_image_resource_group_name": "{{user `resource_group`}}",
-      "managed_image_name": "gtsimage-app",
+      "managed_image_name": "gtsimage-redhat-app",
       "os_type": "Linux",
       "image_publisher": "RedHat",
       "image_offer": "RHEL",
-      "image_sku": "your-sku", // Replace with your private image SKU
-      "image_version": "latest",
-      "location": "East US", // Replace with your desired region
+      "image_sku": "7.9", // Adjust based on your private image details
+      "image_version": "latest", // Use the version of your private image
+      "location": "East US", // Adjust to your region
       "vm_size": "Standard_DS2_v2"
     }
   ],
@@ -21,9 +21,11 @@
     {
       "type": "shell",
       "inline": [
-        "sudo useradd -m appuser", // Add application user
+        "sudo useradd -m appuser", // Add appuser
         "sudo mkdir /opt/appdir", // Create empty directory
-        "sudo chown appuser:appuser /opt/appdir" // Set ownership
+        "sudo chown appuser:appuser /opt/appdir", // Set ownership
+        "echo 'cloud-user ALL=(appuser) NOPASSWD: ALL' | sudo tee /etc/sudoers.d/appuser-switch", // Allow cloud-user to switch to appuser
+        "sudo chmod 440 /etc/sudoers.d/appuser-switch" // Set correct permissions for sudoers file
       ]
     }
   ]
